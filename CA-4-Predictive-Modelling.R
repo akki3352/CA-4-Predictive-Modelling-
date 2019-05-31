@@ -25,6 +25,8 @@ library(tseries)
 # Loading data
 Crime_Unemployment_rate <- read.csv("Crime_Unemployment_rate.csv")
 Crime_Unemployment_rate[,1] <- NULL
+Crime_Unemployment_rate[,4] <- NULL
+
 Crime_Unemployment_rate$Unemployment_rate_greater_than_12 <- ifelse(Crime_Unemployment_rate$Unemployment_Rate > 12,
                                                                     "High", "Low")
 
@@ -128,19 +130,22 @@ ggplot(T_Crime_Unemployment_rate, aes(x = Period, y = value)) +
   scale_fill_manual(values = c("#00AFBB", "#E7B800"))
 
 
-# Base plot with Period axis
-p <- ggplot(data = Crime_Unemployment_rate, aes(x = Period, y = Crime_rate)) + 
-  geom_line(color = "#00AFBB", size = 1)
-p
+# Comparing crime rate and unemployment rate
+ggplot(data = Crime_Unemployment_rate, aes(x = Crime_rate, y = Unemployment_Rate)) +
+  geom_line(aes(size = Crime_rate/Unemployment_Rate), color = "#FC4E07")
 
+# applying time series on dataset
 ts_crime_unemployment <- ts(Crime_Unemployment_rate$Crime_rate, Crime_Unemployment_rate$Unemployment_Rate)
 plot(ts_crime_unemployment)
 
+# forecast the crime and unemployment rate comparision
 m_ets = ets(ts_crime_unemployment)
 f_ets = forecast(m_ets, h=24) # forecast 24 months into the future
-plot(f_ets)
+plot(f_ets, xlab = "Crime Rate", ylab = "Unemployment Rate")
 
 
-m_tbats = tbats(ts_crime_unemployment)
-f_tbats = forecast(m_tbats, h=24)
-plot(f_tbats)
+
+
+
+
+
